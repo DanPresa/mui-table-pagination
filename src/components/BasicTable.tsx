@@ -1,5 +1,4 @@
-import { FC, useState } from 'react';
-import axios from 'axios';
+import { FC } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,50 +7,45 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Button, TablePagination } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import {
+  getAllUsers,
+  getAllUsersPaginated,
+} from '../redux/users/users.actions';
+import { setLimit, setPage, userSelector } from '../redux/users/users.slice';
 
 const BasicTable: FC<unknown> = () => {
-  const [data, setData] = useState<UserElement[]>([]);
-  const [page, setPage] = useState(0);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [limit, setLimit] = useState(5);
+  const dispatch = useAppDispatch();
+  const { data, page, limit, totalRecords } = useAppSelector(userSelector);
 
-  const fetchData = async (page: number, limit: number) => {
-    try {
-      const { data } = await axios.get<UserData>(
-        `https://dummyjson.com/users?skip=${page * limit}&limit=${limit}`
-      );
-      const { users, total } = data;
-
-      console.log(users);
-      setData(users);
-      setTotalRecords(total);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+  const handleClickGetPaginatedData = () => {
+    dispatch(getAllUsersPaginated());
   };
 
-  const handleClickGetData = () => {
-    fetchData(page, limit);
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-    fetchData(newPage, limit);
+  const handleChangePage = (_: unknown, newPage: number) => {
+    dispatch(setPage(newPage));
+    dispatch(getAllUsersPaginated(newPage, limit));
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const newLimit = parseInt(event.target.value, 10);
-    setLimit(newLimit);
-    setPage(0);
-    fetchData(0, newLimit);
+    dispatch(setLimit(newLimit));
+    dispatch(getAllUsersPaginated(0, newLimit));
+  };
+
+  const handleClickGetAllUsers = () => {
+    dispatch(getAllUsers());
   };
 
   return (
     <>
-      <Button variant="contained" onClick={handleClickGetData}>
-        Get All Data
+      <Button variant="contained" onClick={handleClickGetPaginatedData}>
+        Get All Paginated Users
+      </Button>
+      <Button variant="outlined" onClick={handleClickGetAllUsers}>
+        Get All Users
       </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -65,7 +59,7 @@ const BasicTable: FC<unknown> = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row: UserElement) => (
+            {data.map((row: User) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell>{row.firstName}</TableCell>

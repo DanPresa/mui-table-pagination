@@ -1,11 +1,19 @@
+interface UserState {
+  data: User[];
+  totalRecords: number;
+  page: number;
+  limit: number;
+  skip: number;
+}
+
 interface UserData {
-  users: UserElement[];
+  users: User[];
   total: number;
   skip: number;
   limit: number;
 }
 
-interface UserElement {
+interface User {
   id: number;
   firstName: string;
   lastName: string;
