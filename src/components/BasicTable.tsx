@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,8 +18,16 @@ const BasicTable: FC<unknown> = () => {
   const dispatch = useAppDispatch();
   const { data, page, limit, totalRecords } = useAppSelector(userSelector);
 
+  const [hidePagination, setHidePagination] = useState(false);
+
   const handleClickGetPaginatedData = () => {
+    setHidePagination(true);
     dispatch(getAllUsersPaginated());
+  };
+
+  const handleClickGetAllUsers = () => {
+    setHidePagination(false);
+    dispatch(getAllUsers());
   };
 
   const handleChangePage = (_: unknown, newPage: number) => {
@@ -33,10 +41,6 @@ const BasicTable: FC<unknown> = () => {
     const newLimit = parseInt(event.target.value, 10);
     dispatch(setLimit(newLimit));
     dispatch(getAllUsersPaginated(0, newLimit));
-  };
-
-  const handleClickGetAllUsers = () => {
-    dispatch(getAllUsers());
   };
 
   return (
@@ -71,15 +75,17 @@ const BasicTable: FC<unknown> = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-        component="div"
-        count={totalRecords}
-        rowsPerPage={limit}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {hidePagination && (
+        <TablePagination
+          rowsPerPageOptions={[20, 50, 75, { label: 'All', value: -1 }]}
+          component="div"
+          count={totalRecords}
+          rowsPerPage={limit}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      )}
     </>
   );
 };

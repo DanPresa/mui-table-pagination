@@ -4,7 +4,7 @@ import { RootState } from '../reducers';
 const initialUserState: UserState = {
   data: [],
   page: 0,
-  limit: 5,
+  limit: 20,
   totalRecords: 0,
   skip: 0,
 };
@@ -16,7 +16,7 @@ const userSlice = createSlice({
     setData: (state, action: PayloadAction<UserData>) => {
       state.data = action.payload.users;
       state.totalRecords = action.payload.total - 1;
-      state.skip = action.payload.skip;
+      // state.skip = action.payload.skip;
     },
     setPage: (state, action: PayloadAction<number>) => {
       state.page = action.payload;

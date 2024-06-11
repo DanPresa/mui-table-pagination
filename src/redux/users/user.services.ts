@@ -1,6 +1,9 @@
 import clientApi from '../../config/clientApi';
 
-export const fetchUserData = async (page?: number, limit?: number) => {
+export const fetchUserData = async (
+  page?: number | undefined,
+  limit?: number | undefined
+) => {
   let response;
   if (page !== undefined && limit !== undefined) {
     response = await clientApi.get<UserData>(
