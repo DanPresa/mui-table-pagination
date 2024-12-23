@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,17 +6,24 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Button, TablePagination } from '@mui/material';
+import { Button, TablePagination, TableSortLabel } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import {
   getAllUsers,
   getAllUsersPaginated,
 } from '../redux/users/users.actions';
-import { setLimit, setPage, userSelector } from '../redux/users/users.slice';
+import {
+  setLimit,
+  setPage,
+  setOrder,
+  setSortBy,
+  userSelector,
+} from '../redux/users/users.slice';
 
 const BasicTable: FC<unknown> = () => {
   const dispatch = useAppDispatch();
-  const { data, page, limit, totalRecords } = useAppSelector(userSelector);
+  const { data, page, limit, totalRecords, sortBy, order } =
+    useAppSelector(userSelector);
 
   const [hidePagination, setHidePagination] = useState(false);
 
@@ -35,12 +42,17 @@ const BasicTable: FC<unknown> = () => {
     dispatch(getAllUsersPaginated(newPage, limit));
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
     const newLimit = parseInt(event.target.value, 10);
     dispatch(setLimit(newLimit));
     dispatch(getAllUsersPaginated(0, newLimit));
+  };
+
+  const handleRequestSort = (property: keyof User) => {
+    const isAsc = sortBy === property && order === 'asc';
+    dispatch(setOrder(isAsc ? 'desc' : 'asc'));
+    dispatch(setSortBy(property));
+    dispatch(getAllUsersPaginated(page, limit));
   };
 
   return (
@@ -55,8 +67,24 @@ const BasicTable: FC<unknown> = () => {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>First Name</TableCell>
+              <TableCell sortDirection={sortBy === 'id' ? order : false}>
+                <TableSortLabel
+                  active={sortBy === 'id'}
+                  direction={sortBy === 'id' ? order : 'asc'}
+                  onClick={() => handleRequestSort('id')}
+                >
+                  ID
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sortDirection={sortBy === 'firstName' ? order : false}>
+                <TableSortLabel
+                  active={sortBy === 'firstName'}
+                  direction={sortBy === 'firstName' ? order : 'asc'}
+                  onClick={() => handleRequestSort('firstName')}
+                >
+                  First Name
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Last Name</TableCell>
               <TableCell>Age</TableCell>
               <TableCell>E-mail</TableCell>

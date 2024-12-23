@@ -7,6 +7,8 @@ const initialUserState: UserState = {
   limit: 20,
   totalRecords: 0,
   skip: 0,
+  sortBy: 'id',
+  order: 'asc',
 };
 
 const userSlice = createSlice({
@@ -15,7 +17,7 @@ const userSlice = createSlice({
   reducers: {
     setData: (state, action: PayloadAction<UserData>) => {
       state.data = action.payload.users;
-      state.totalRecords = action.payload.total - 1;
+      state.totalRecords = action.payload.total;
       // state.skip = action.payload.skip;
     },
     setPage: (state, action: PayloadAction<number>) => {
@@ -24,9 +26,16 @@ const userSlice = createSlice({
     setLimit: (state, action: PayloadAction<number>) => {
       state.limit = action.payload;
     },
+    setSortBy: (state, action: PayloadAction<keyof User>) => {
+      state.sortBy = action.payload;
+    },
+    setOrder: (state, action: PayloadAction<'asc' | 'desc'>) => {
+      state.order = action.payload;
+    },
   },
 });
 
 export const userSelector = (state: RootState) => state.users;
-export const { setData, setPage, setLimit } = userSlice.actions;
+export const { setData, setPage, setLimit, setSortBy, setOrder } =
+  userSlice.actions;
 export default userSlice.reducer;

@@ -4,6 +4,8 @@ interface UserState {
   page: number;
   limit: number;
   skip: number;
+  sortBy: keyof User;
+  order: 'asc' | 'desc';
 }
 
 interface UserData {
